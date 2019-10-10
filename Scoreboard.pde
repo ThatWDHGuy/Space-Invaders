@@ -13,7 +13,8 @@ public class Scoreboard {
   public void drawScore() {
     int x = (width/scale) - 80;
     int y = (height/scale) - 5;
-    textMode(MODEL); //draw Game over
+    textMode(MODEL); 
+    fill(255);
     text("Score: " + score, x, y);
   }
 }

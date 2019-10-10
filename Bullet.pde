@@ -1,5 +1,4 @@
 //bullet fired from ship
-import java.util.*;
 public class Bullet {
 
   double x, y;
@@ -33,11 +32,14 @@ public class Bullet {
   }
 
   public boolean hit(double tx, double ty, int wid, int hei) { // did something it the bullet? and was the bullet active
-    if ((Math.hypot(tx - x, ty - y) < Math.min(wid, hei) || ((y < ty + hei/2 && y > ty - hei/2) && (x < tx + wid/2 && x> tx - wid/2))) && active) {
-      return true;
-    } else {
-      return false;
-    }
+   if (active) {
+      if ((y < ty + hei/2 && y > ty - hei/2) && (x < tx + wid/2 && x> tx - wid/2)) {
+        return true;
+      } else {
+        return Math.hypot(tx - x, ty - y) < Math.min(wid, hei);
+      }
+    } 
+    return false;
   }
 
   public void explode() { // when bullet explodes make it inactive and make the blocks explode

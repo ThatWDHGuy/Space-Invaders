@@ -1,6 +1,5 @@
 //class of one of the shields
 
-import java.util.*;
 
 public class Shield {
 
@@ -21,17 +20,18 @@ public class Shield {
       }
     }
   }
+  
 
   public void checkHit() { // fix removing sBuls from hashSet after amount of time;
     //println(c.sBuls.size() + " " + s.bullets.size());
     for (SpacieBullet sBul : c.sBuls) {
       boolean delBul = false;
-      if (sBul.active) { // if bullet hasnt exploded
+      if (sBul.active && sBul.y > ((double)(height/scale) * ((double) 3.75 / (double) 6))) { // if bullet hasnt exploded
         for (Block blo : blocks) {
           if (Math.hypot(sBul.x - blo.x, sBul.y - blo.y) < 2 && !blo.falling) { // check if bullet hit another block that is still active
             delBul = true;
             for (Block bloc : blocks) {
-              if (Math.hypot(sBul.x - bloc.x, sBul.y - bloc.y) < 3) { // check blocks in 3 block radius for explosion
+              if (Math.hypot(sBul.x - bloc.x, sBul.y - bloc.y) < sBul.rad) { // check blocks in 'rad' block radius for explosion
                 bloc.initFall();
               }
             }

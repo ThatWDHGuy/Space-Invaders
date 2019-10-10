@@ -1,17 +1,18 @@
 //class of space invaders
 
-import java.util.*;
 class Spacie {
   double x, y;
+  double bombX, bombY;
   boolean active = true;
+  boolean bombing = false;
   int using = 1; // 1 = up, 0 = down
   int[][] shapeD;
   int[][] shapeU;
   HashSet<Block> blocks = new HashSet<Block>();
   boolean firing;
   int row, col;
-  int fireMin = 150;
-  int fireMax = 450;
+  int fireMin = 300;
+  int fireMax = 900;
   int fireWait = (int) random(fireMin, fireMax);
   int type;
   int diff = 1;
@@ -81,7 +82,7 @@ class Spacie {
       fireWait--; // count down time till fire
       if (fireWait <= 0) { // time to fire
         fireWait = (int) random(fireMin/diff, fireMax/diff); //reset firewait to random time
-        c.addBullet( x, y + 10); // fire
+        c.addBullet( x, y + 10, 3 + diff); // fire
       }
     }
   }

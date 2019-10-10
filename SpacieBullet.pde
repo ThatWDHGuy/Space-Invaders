@@ -1,23 +1,34 @@
 //class of spacie bullet
-import java.util.*;
 public class SpacieBullet {
 
   double x, y;
-  int[][] shapeL = spacieBulletModelL; // models of bullet
-  int[][] shapeR = spacieBulletModelR;
+  float angle = 0;
   HashSet<Block> blocks = new HashSet<Block>(); // set of blocks in bullet
   boolean active = true;
-  int shapeNo = 0;
-  int[][] shape = shapeL;
+  int[][] shape = spacieBulletModel;
+  int rad;
 
-  public SpacieBullet(double x, double y) { //make bullet at x,y
+  public SpacieBullet(double x, double y, int rad) { //make bullet at x,y
     this.x = x;
     this.y = y;
+    this.rad = rad;
+  }
+
+  public SpacieBullet(double x, double y, int rad, float angle) { //make bullet at x,y
+    this.x = x;
+    this.y = y;
+    this.rad = rad;
+    this.angle = angle;
   }
 
   public void move() { // move down when active
     if (active) {
-      y += 2;
+      if (angle == -1) {
+        y += 1.5;
+      } else {
+        x += sin(angle);
+        y += cos(angle);
+      }
     }
   }
 
@@ -47,25 +58,20 @@ public class SpacieBullet {
   }
 
   public void drawBullet() {
-    if (shapeNo == 1 && !pause) { //swap bullet from L to R model
-      shapeNo = 0;
-      shape = shapeL;
-    } else {
-      if (!pause) {
-        shapeNo = 1;
-        shape = shapeR;
-      }
-    }
     color c = color(128); // grey bullets
     fill(c);
     if (active) {
+      pushMatrix();
+      translate((float)x, (float)y);
+      rotate(-angle);
       for (int i = 0; i < shape[0].length; i++) {
         for (int ii = 0; ii < shape.length; ii++) { //draw rectangles where bullet model shows
           if (shape[ii][i] == 1) {
-            rect((int) (x - 1 + i), (int) (y - 3 + ii), 1, 1);
+            rect((int) (- 1 + i), (int) (- 3 + ii), 1, 1);
           }
         }
       }
+      popMatrix();
     } else {
       HashSet<Block> toRemove = new HashSet<Block>(); // set to add blocks to remove to
       for (Block b : blocks) {

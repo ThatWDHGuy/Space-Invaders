@@ -1,9 +1,9 @@
 //ship that fires and is conrolled by player
-import java.util.*;
 public class Ship {
 
   double x, y;
-  int moveDir = 0; // which way is ship moving
+  //int moveDir = 0; // which way is ship moving
+  ArrayList<Integer> moveQueue = new ArrayList<Integer>();
   HashSet<Bullet> bullets = new HashSet<Bullet>(); // set of bullets
   long bulletWaitCount = 0;
   long bulletWaitNum = 75; // time between firing shots
@@ -14,11 +14,13 @@ public class Ship {
   boolean heal = false;
   int powerUpState = 0;
   int powerUpTimer = 0;
+  boolean overrideTimer = false;
+  boolean firing = false;
+  boolean invinsible = false;
 
   public Ship(double x, double y) {
     this.x = x;
     this.y = y;
-
     color c = color(0, 255, 0);
     for (int i = 0; i < shape[0].length; i++) {
       for (int ii = 0; ii < shape.length; ii++) {
@@ -32,25 +34,28 @@ public class Ship {
   }
 
   public void move() {
-    if (x + moveDir < (width/scale) - 2*bumper && x + moveDir > 2*bumper) { // as long as ship is within the bumper region
-      x += moveDir; // move it and move blocks
-      for (Block b : blocks) {
-        if (!b.falling) {
-          b.x += moveDir;
+    if (moveQueue.size() != 0) {
+      int moveDir = moveQueue.get(0);
+      if (x + moveDir < (width/scale) - 2*bumper && x + moveDir > 2*bumper) { // as long as ship is within the bumper region
+        x += moveDir; // move it and move blocks
+        for (Block b : blocks) {
+          if (!b.falling) {
+            b.x += moveDir;
+          }
         }
       }
-      HashSet<Bullet> toRemoveBul = new HashSet<Bullet>(); // set of bullets to be removed
-      for (Bullet b : s.bullets) { //move bullet and check if bullet has no debris left
-        b.move();
-        if ( b.blocks.size() == 0) { // if no debris add bullet to be removed to set
-          toRemoveBul.add(b);
-        }
-      }
-      for (Bullet b : toRemoveBul) { // remove all bullets in the set
-        s.bullets.remove(b);
-      }
-      bulletWaitCount++; // add to counter between bullet firing
     }
+    HashSet<Bullet> toRemoveBul = new HashSet<Bullet>(); // set of bullets to be removed
+    for (Bullet b : s.bullets) { //move bullet and check if bullet has no debris left
+      b.move();
+      if ( b.blocks.size() == 0 || b.y < -50) { // if no debris add bullet to be removed to set
+        toRemoveBul.add(b);
+      }
+    }
+    for (Bullet b : toRemoveBul) { // remove all bullets in the set
+      s.bullets.remove(b);
+    }
+    bulletWaitCount++; // add to counter between bullet firing
   }
 
   public void fire() { //fire bullet
@@ -64,8 +69,18 @@ public class Ship {
         bullets.add(new Bullet(x - 5, y));
         bullets.add(new Bullet(x + 5, y));
       } else if (powerUpState == 3) { //rapid fire
-        bulletWaitCount = 65;
+        bulletWaitCount = 45;
         bullets.add(new Bullet(x, y));
+      } else if (powerUpState == 4) { // Semi-God
+        bulletWaitCount = 45;
+        bullets.add(new Bullet(x, y + 3));
+        bullets.add(new Bullet(x - 5, y));
+        bullets.add(new Bullet(x + 5, y));
+      } else if (powerUpState == 5) { // God
+        bulletWaitCount = 70;
+        bullets.add(new Bullet(x, y + 3));
+        bullets.add(new Bullet(x - 5, y));
+        bullets.add(new Bullet(x + 5, y));
       }
     }
   }
@@ -77,9 +92,10 @@ public class Ship {
           sBul.explode(); // explode bullet
           if (invincibleTime <= 0) { // if its not in the invinsibilty time. add time to the invinsibility counter and -1 from lives
             invincibleTime = 120;
-            if (powerUpState != 1) {
+            if (!invinsible) {
               lives--;
             }
+            //println(invinsible + " " + powerUpState);
           }
           explodeShipParts();
         }
@@ -97,11 +113,14 @@ public class Ship {
   }
 
   public void drawShip() {
-    if (powerUpTimer == 0) {
-      powerUpState = 0;
-    } else {
-      powerUpTimer--;
-    }
+    /*if (!overrideTimer) {
+      if (powerUpTimer == 0) {
+        powerUpState = 0;
+        s.invinsible = false;
+      } else {
+        powerUpTimer--;
+      }
+    }*/
     if (invincibleTime >= 0 && !pause) { // if ship is invinsible, -1 from timer
       invincibleTime--;
     }
@@ -118,19 +137,11 @@ public class Ship {
       }
     }
 
+
     for (Bullet b : bullets) { // draw all bullets
       b.drawBullet();
     }
-    color c = color(255);
-    if (powerUpState == 0) {
-      c = color(0, 255, 0);
-    } else if (powerUpState == 1) {
-      c = color(0, 0, 255);
-    } else if (powerUpState == 2) {
-      c = color(255, 255, 0);
-    } else if (powerUpState == 3) {
-      c = color(255, 0, 0);
-    }
+    color c = color(getPowerUpCol(powerUpState));
 
     HashSet<Block> toRemove = new HashSet<Block>(); // blocks to remove if it goes off screen
     for (Block b : blocks) {

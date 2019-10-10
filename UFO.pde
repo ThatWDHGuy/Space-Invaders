@@ -6,8 +6,8 @@ class UFO { //make ufo drop power up
   boolean active = true;
   int using = 1; 
   HashSet<Block> blocks = new HashSet<Block>();
-  int flyMin = 1500;
-  int flyMax = 3000;
+  int flyMin = 500;
+  int flyMax = 1000;
   int flyWait = (int) random(flyMin, flyMax);
   int changeCount = 0;
 
@@ -25,20 +25,20 @@ class UFO { //make ufo drop power up
     }
   }
 
-  public void gotHit() { // when spacie inader is hit
+  public void gotHit() { // when UFO is hit
     color c = color(255);
     blocks.clear(); //ensure blocks is empty
     for (int i = 0; i < shape1[0].length; i++) {
       for (int ii = 0; ii < shape1.length; ii++) {//make space invader out of blocks when it gets hit
         if (using == 1) { //arms down
           if (shape1[ii][i] == 1) {
-            Block b = new Block((int) (x - 6 + i), (int) (y - 4 + ii));
+            Block b = new Block((int) (x - 12 + i), (int) (y - 4 + ii));
             blocks.add(b);
             b.drawBlock(c);
           }
         } else { //arms up
           if (shape2[ii][i] == 1) { 
-            Block b = new Block((int) (x - 6 + i), (int) (y - 4 + ii));
+            Block b = new Block((int) (x - 12 + i), (int) (y - 4 + ii));
             blocks.add(b);
             b.drawBlock(c);
           }
@@ -57,12 +57,14 @@ class UFO { //make ufo drop power up
   }
 
   public void checkHit() {
-    for (Bullet b : s.bullets) {
-      if (b.hit(x, y, shape1[0].length, shape1.length)) { // check if bullet has hit     
-        gotHit();
-        b.explode();
-        dropPowerUp();
-        sc.addScore(3000);
+    if (active) {
+      for (Bullet b : s.bullets) {
+        if (b.hit(x, y, shape1[0].length, shape1.length)) { // check if bullet has hit     
+          gotHit();
+          b.explode();
+          dropPowerUp();
+          sc.addScore(3000);
+        }
       }
     }
   }
@@ -94,11 +96,11 @@ class UFO { //make ufo drop power up
         for (int ii = 0; ii < shape1.length; ii++) {
           if (using == 1) { // arms down
             if (shape1[ii][i] == 1) {
-              rect((int) (x - 6 + i), (int) (y - 4 + ii), 1, 1); //draw spacie as rectangles and not blocks to reduce lag
+              rect((int) (x - 12 + i), (int) (y - 4 + ii), 1, 1); //draw spacie as rectangles and not blocks to reduce lag
             }
           } else {// arms down
             if (shape2[ii][i] == 1) {
-              rect((int) (x - 6 + i), (int) (y - 4 + ii), 1, 1); //draw spacie as rectangles and not blocks to reduce lag
+              rect((int) (x - 12 + i), (int) (y - 4 + ii), 1, 1); //draw spacie as rectangles and not blocks to reduce lag
             }
           }
         }
